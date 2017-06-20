@@ -88,10 +88,10 @@ fn draw_field(main_window: &Window, snake: &Snake, food: &Food) {
 fn get_direction_from_keypress (keypress: Option<Input>) -> Option<Direction> {
     match keypress {
         Some(keypress) => match keypress {
-            Input::KeyUp => Some(Direction::Up),
-            Input::KeyDown => Some(Direction::Down),
-            Input::KeyRight => Some(Direction::Right),
-            Input::KeyLeft => Some(Direction::Left),
+            Input::KeyUp | Input::Character('k') => Some(Direction::Up),
+            Input::KeyDown | Input::Character('j') => Some(Direction::Down),
+            Input::KeyRight | Input::Character('l') => Some(Direction::Right),
+            Input::KeyLeft | Input::Character('h') => Some(Direction::Left),
             _ => None
         },
         None => None
@@ -153,6 +153,4 @@ fn main() {
         let sleep_time = Duration::from_millis(100);
         thread::sleep(sleep_time)
     }
-
-    // endwin();
 }
