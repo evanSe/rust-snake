@@ -8,7 +8,7 @@ use rand::Rng;
 const FIELD_CHARACTER: char = 'a';
 const FOOD_CHARACTER: char = 'b';
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq)]
 enum Direction {
     Up,
     Down,
@@ -40,6 +40,22 @@ struct Snake {
 struct Food {
     position: Point
 }
+
+impl Direction {
+    fn get_opposite (direction: &Direction) -> Direction {
+        match *direction {
+            Direction::Up => Direction::Down,
+            Direction::Down => Direction::Up,
+            Direction::Left => Direction::Right,
+            Direction::Right => Direction::Left
+        }
+    }
+
+    fn is_opposite (&self, direction: &Direction) -> bool {
+        Direction::get_opposite(self) == *direction
+    }
+}
+
 
 impl Snake {
     fn move_body (&mut self, is_growing: &bool, main_window_x: &i32, main_window_y: &i32) {
@@ -73,7 +89,9 @@ impl Snake {
     }
 
     fn change_direction (&mut self, new_direction: Direction) {
-        self.direction = new_direction;
+        if !self.direction.is_opposite(&new_direction) {
+            self.direction = new_direction;
+        }
     }
 
     fn detect_body_collision (&self) -> bool {
@@ -144,12 +162,15 @@ fn main() {
             y: (rng.gen::<i32>() % main_window_y).abs()
         }
     };
-
+    let mut speed = 100;
     loop {
         let food_eaten = player.eat(&food);
         draw_field(&main_window, &player, &food);
         player.move_body(&food_eaten, &main_window_x, &main_window_y);
         if food_eaten {
+            if speed > 10 {
+                speed -= 5;
+            }
             food = Food {
                 position: Point {
                     x: (rng.gen::<i32>() % main_window_x).abs(),
@@ -167,7 +188,7 @@ fn main() {
         get_direction_from_keypress(keypress)
             .map(|direction| player.change_direction(direction));
 
-        let sleep_time = Duration::from_millis(100);
+        let sleep_time = Duration::from_millis(speed);
         thread::sleep(sleep_time)
     }
 
